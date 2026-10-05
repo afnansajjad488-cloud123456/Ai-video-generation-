@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#09090b" />
+  <title>VIP AI Video Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          boxShadow: {
+            glow: '0 0 50px rgba(168,85,247,.16)'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute left-1/2 top-[-260px] h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-purple-600/10 blur-3xl"></div>
+    <div class="absolute bottom-[-300px] right-[-200px] h-[600px] w-[600px] rounded-full bg-fuchsia-600/10 blur-3xl"></div>
+  </div>
+
+  <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+          FREE AI VIDEO STUDIO
+        </div>
+        <h1 class="text-3xl font-black tracking-tight sm:text-5xl">VIP AI Video Studio</h1>
+        <p class="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">
+          Topic do — script, scenes, images, voiceover aur final video automated pipeline se generate hoga.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-zinc-400">
+        <div class="font-semibold text-zinc-200">Backend</div>
+        <div class="mt-1 break-all">Tailscale n8n • 4 segments</div>
+      </div>
+    </header>
+
+    <section class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+      <div class="rounded-3xl border border-white/10 bg-white/[.04] p-5 shadow-glow backdrop-blur sm:p-7">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold">Create your video</h2>
+          <p class="mt-1 text-sm text-zinc-400">Simple inputs — baqi automation khud handle karegi.</p>
+        </div>
+
+        <form id="videoForm" class="space-y-5">
+          <div>
+            <label for="prompt" class="mb-2 block text-sm font-medium text-zinc-200">Video Topic / Prompt</label>
+            <textarea id="prompt" required rows="6"
+              placeholder="Example: Explain black holes in simple Urdu for beginners..."
+              class="w-full resize-y rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none transition placeholder:text-zinc-600 focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20"></textarea>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="duration" class="mb-2 block text-sm font-medium text-zinc-200">Duration (seconds)</label>
+              <input id="duration" type="number" min="5" max="600" value="60" required
+                class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20" />
+            </div>
+            <div>
+              <label for="language" class="mb-2 block text-sm font-medium text-zinc-200">Language</label>
+              <select id="language"
+                class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20">
+                <option value="English">English</option>
+                <option value="Urdu">Urdu</option>
+                <option value="Roman Urdu">Roman Urdu</option>
+                <option value="Hindi">Hindi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label for="aspect" class="mb-2 block text-sm font-medium text-zinc-200">Aspect Ratio</label>
+              <select id="aspect" class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70">
+                <option value="16:9">16:9</option>
+                <option value="9:16">9:16</option>
+                <option value="1:1">1:1</option>
+              </select>
+            </div>
+            <div>
+              <label for="resolution" class="mb-2 block text-sm font-medium text-zinc-200">Resolution</label>
+              <select id="resolution" class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70">
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+                <option value="480p">480p</option>
+              </select>
+            </div>
+            <div>
+              <label for="style" class="mb-2 block text-sm font-medium text-zinc-200">Style</label>
+              <select id="style" class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70">
+                <option value="cinematic">Cinematic</option>
+                <option value="documentary">Documentary</option>
+                <option value="realistic">Realistic</option>
+                <option value="anime">Anime</option>
+                <option value="minimal">Minimal</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="generateBtn" type="submit"
+            class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
+            <span id="btnIcon">✨</span>
+            <span id="btnText">Generate Video</span>
+          </button>
+        </form>
+
+        <div id="errorBox" class="mt-5 hidden rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200"></div>
+      </div>
+
+      <div class="rounded-3xl border border-white/10 bg-white/[.04] p-5 backdrop-blur sm:p-7">
+        <div class="mb-6 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold">Live Progress</h2>
+            <p id="jobLabel" class="mt-1 text-xs text-zinc-500">No active job</p>
+          </div>
+          <div id="overallBadge" class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-400">⏳ Waiting</div>
+        </div>
+
+        <div id="steps" class="space-y-3">
+          <div data-step="script" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div class="flex items-center gap-3">
+              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">1</div>
+              <div class="min-w-0 flex-1"><div class="font-semibold">Script & Scenes</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
+              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
+            </div>
+          </div>
+          <div data-step="images" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div class="flex items-center gap-3">
+              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">2</div>
+              <div class="min-w-0 flex-1"><div class="font-semibold">Visual Images</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
+              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
+            </div>
+          </div>
+          <div data-step="audio" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div class="flex items-center gap-3">
+              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">3</div>
+              <div class="min-w-0 flex-1"><div class="font-semibold">Voiceover Audio</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
+              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
+            </div>
+          </div>
+          <div data-step="compile" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div class="flex items-center gap-3">
+              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">4</div>
+              <div class="min-w-0 flex-1"><div class="font-semibold">Final Compilation</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
+              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="resultBox" class="mt-6 hidden rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+          <div class="text-sm font-bold text-emerald-300">✅ Video Ready</div>
+          <p class="mt-1 text-xs text-zinc-400">Final rendered video:</p>
+          <a id="videoLink" href="#" target="_blank" rel="noopener noreferrer"
+             class="mt-3 block truncate rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-semibold text-white hover:bg-black/30"></a>
+          <video id="videoPreview" class="mt-4 hidden w-full rounded-2xl border border-white/10" controls playsinline></video>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-8 text-center text-xs text-zinc-600">
+      VIP AI Video Studio • Frontend hosted on GitHub Pages • Orchestration via n8n
+    </footer>
+  </main>
+
+<script>
+(() => {
+  const N8N_BASE = "https://founder-workstation.taila75704.ts.net:8443";
+  const endpoints = {
+    script: N8N_BASE + "/webhook/generate-video",
+    images: N8N_BASE + "/webhook/generate-images",
+    audio: N8N_BASE + "/webhook/generate-audio",
+    compile: N8N_BASE + "/webhook/compile-video"
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const form = $("videoForm");
+  const button = $("generateBtn");
+  const errorBox = $("errorBox");
+  const resultBox = $("resultBox");
+  const videoLink = $("videoLink");
+  const videoPreview = $("videoPreview");
+
+  function resetUI() {
+    errorBox.classList.add("hidden");
+    resultBox.classList.add("hidden");
+    videoPreview.classList.add("hidden");
+    videoPreview.removeAttribute("src");
+    $("jobLabel").textContent = "Starting new job...";
+    $("overallBadge").textContent = "🔄 Generating...";
+    document.querySelectorAll(".step").forEach((el) => {
+      el.className = "step rounded-2xl border border-white/10 bg-black/20 p-4";
+      el.querySelector(".step-status").textContent = "Waiting";
+      el.querySelector(".step-badge").textContent = "⏳ Waiting";
+      el.querySelector(".step-badge").className = "step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500";
+    });
+  }
+
+  function setStep(name, state, message) {
+    const el = document.querySelector('[data-step="' + name + '"]');
+    if (!el) return;
+    const badge = el.querySelector(".step-badge");
+    const status = el.querySelector(".step-status");
+    const icon = el.querySelector(".step-icon");
+
+    if (state === "working") {
+      el.className = "step rounded-2xl border border-purple-400/20 bg-purple-500/10 p-4";
+      badge.textContent = "🔄 Generating...";
+      badge.className = "step-badge rounded-full border border-purple-400/20 bg-purple-400/10 px-2.5 py-1 text-[11px] text-purple-200";
+      icon.textContent = "⏳";
+    } else if (state === "done") {
+      el.className = "step rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4";
+      badge.textContent = "✅ Done";
+      badge.className = "step-badge rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[11px] text-emerald-200";
+      icon.textContent = "✓";
+    } else if (state === "error") {
+      el.className = "step rounded-2xl border border-red-400/20 bg-red-400/10 p-4";
+      badge.textContent = "❌ Failed";
+      badge.className = "step-badge rounded-full border border-red-400/20 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-200";
+      icon.textContent = "!";
+    } else {
+      icon.textContent = name === "script" ? "1" : name === "images" ? "2" : name === "audio" ? "3" : "4";
+    }
+    status.textContent = message || (state === "working" ? "Generating..." : state === "done" ? "Completed" : "Waiting");
+  }
+
+  function showError(message) {
+    errorBox.textContent = message;
+    errorBox.classList.remove("hidden");
+    $("overallBadge").textContent = "❌ Failed";
+  }
+
+  async function postJSON(url, body, timeoutMs = 10 * 60 * 1000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      const raw = await response.text();
+      let data;
+      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { raw }; }
+      if (!response.ok) {
+        throw new Error(data?.message || data?.error || raw || ("HTTP " + response.status));
+      }
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  function findJobId(data) {
+    return data?.job_id || data?.jobId || data?.data?.job_id || data?.data?.jobId;
+  }
+
+  function findVideoUrl(data) {
+    return data?.video_url || data?.videoUrl || data?.final_video_url || data?.url ||
+           data?.data?.video_url || data?.data?.videoUrl || data?.data?.final_video_url || data?.data?.url;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    resetUI();
+
+    const payload = {
+      prompt: $("prompt").value.trim(),
+      duration: Number($("duration").value),
+      language: $("language").value,
+      aspect_ratio: $("aspect").value,
+      resolution: $("resolution").value,
+      style: $("style").value
+    };
+
+    if (!payload.prompt) return showError("Please enter a video topic/prompt.");
+    if (!Number.isFinite(payload.duration) || payload.duration < 5) return showError("Duration must be at least 5 seconds.");
+
+    button.disabled = true;
+    $("btnIcon").textContent = "⏳";
+    $("btnText").textContent = "Generating...";
+
+    try {
+      setStep("script", "working", "Creating script, narration & scenes...");
+      const scriptResponse = await postJSON(endpoints.script, payload);
+      const jobId = findJobId(scriptResponse);
+      if (!jobId) throw new Error("Segment 1 completed but no job_id was returned by n8n.");
+
+      $("jobLabel").textContent = "Job ID: " + jobId;
+      setStep("script", "done", "Script & scenes saved");
+
+      setStep("images", "working", "Generating scene images...");
+      await postJSON(endpoints.images, { job_id: jobId });
+      setStep("images", "done", "Visual images saved");
+
+      setStep("audio", "working", "Generating voiceover...");
+      await postJSON(endpoints.audio, { job_id: jobId });
+      setStep("audio", "done", "Voiceover saved");
+
+      setStep("compile", "working", "Rendering final MP4...");
+      const compileResponse = await postJSON(endpoints.compile, { job_id: jobId });
+      const finalUrl = findVideoUrl(compileResponse);
+      if (!finalUrl) throw new Error("Final compilation completed but no video_url was returned.");
+
+      setStep("compile", "done", "Final video rendered");
+      $("overallBadge").textContent = "✅ Completed";
+
+      videoLink.href = finalUrl;
+      videoLink.textContent = finalUrl;
+      videoPreview.src = finalUrl;
+      videoPreview.classList.remove("hidden");
+      resultBox.classList.remove("hidden");
+    } catch (error) {
+      const message = error?.name === "AbortError"
+        ? "Request timed out. Check the n8n execution and try again."
+        : (error?.message || String(error));
+      showError(message);
+      const active = [...document.querySelectorAll(".step")].find(el => el.className.includes("purple"));
+      if (active) active.querySelector(".step-badge").textContent = "❌ Failed";
+    } finally {
+      button.disabled = false;
+      $("btnIcon").textContent = "✨";
+      $("btnText").textContent = "Generate Video";
+    }
+  });
+})();
+</script>
+</body>
+</html>
