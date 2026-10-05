@@ -172,6 +172,9 @@
 <script>
 (() => {
   const N8N_BASE = "https://founder-workstation.taila75704.ts.net:8443";
+  const SUPABASE_URL = "https://icdfvaksuwjbhqpzwcmn.supabase.co";
+  // Supabase is the central job database. The browser does not write to it directly;
+  // n8n handles database access securely on the backend.
   const endpoints = {
     script: N8N_BASE + "/webhook/generate-video",
     images: N8N_BASE + "/webhook/generate-images",
