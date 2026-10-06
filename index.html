@@ -40,7 +40,7 @@ html{scroll-behavior:smooth}body{background:#07070a}
 <section class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
 <div class="glass rounded-3xl border border-white/10 p-5 shadow-glow sm:p-7">
  <div class="mb-6"><h2 class="text-xl font-bold">Create video</h2><p class="mt-1 text-sm text-zinc-500">No account or secret key is required in the browser.</p></div>
- <form id="videoForm" class="space-y-5">
+ <form id="videoForm" onsubmit="return false;" class="space-y-5">
   <div>
    <label class="mb-2 block text-sm font-medium">Topic / prompt</label>
    <textarea id="prompt" required rows="6" placeholder="Example: Explain black holes in simple Urdu for beginners..." class="w-full resize-y rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"></textarea>
@@ -105,7 +105,7 @@ html{scroll-behavior:smooth}body{background:#07070a}
 const API_BASE_URL="https://founder-workstation.taila75704.ts.net:8443";
 const endpoints={script:API_BASE_URL+"/webhook/generate-video",images:API_BASE_URL+"/webhook/generate-images",audio:API_BASE_URL+"/webhook/generate-audio",compile:API_BASE_URL+"/webhook/compile-video"};
 const $=id=>document.getElementById(id), form=$("videoForm"), btn=$("generateBtn"), cancel=$("cancelBtn");
-let controller=null, activeJob=null, currentStage=null;
+let controller=null, activeJob=null, currentStage=null, isGenerating=false;
 const stepNames=["script","images","audio","compile"];
 function setStep(name,state,msg){
  const el=document.querySelector('[data-step="'+name+'"]'); if(!el)return;
@@ -140,7 +140,10 @@ function renderHistory(){let h=[];try{h=JSON.parse(localStorage.getItem("ai_vide
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
 function escapeAttr(s){return String(s||"").replace(/"/g,"&quot;")}
 form.addEventListener("submit",async e=>{
- e.preventDefault();reset();localStorage.setItem("ai_video_draft",JSON.stringify({prompt:$("prompt").value,duration:$("duration").value,language:$("language").value,aspect:$("aspect").value,resolution:$("resolution").value,style:$("style").value}));btn.disabled=true;$("btnText").textContent="⏳ Generating...";
+ e.preventDefault();
+ if(isGenerating)return;
+ isGenerating=true;
+ reset();localStorage.setItem("ai_video_draft",JSON.stringify({prompt:$("prompt").value,duration:$("duration").value,language:$("language").value,aspect:$("aspect").value,resolution:$("resolution").value,style:$("style").value}));btn.disabled=true;$("btnText").textContent="⏳ Generating...";
  const payload={prompt:$("prompt").value.trim(),duration:Number($("duration").value),language:$("language").value,aspect_ratio:$("aspect").value,resolution:$("resolution").value,style:$("style").value};
  if(!payload.prompt){btn.disabled=false;return error("Please enter a topic or prompt.")}
  try{
@@ -155,7 +158,7 @@ form.addEventListener("submit",async e=>{
  }catch(err){
   const msg=err.name==="AbortError"?"Generation cancelled or timed out while Segment "+(currentStage?({script:"1",images:"2",audio:"3",compile:"4"}[currentStage]||"?"):"?")+" was running.":(currentStage?"Segment "+({script:"1",images:"2",audio:"3",compile:"4"}[currentStage]||"?")+" failed: ":"")+ (err.message||String(err));error(msg);
   if(activeJob)saveHistory({job_id:activeJob,prompt:payload.prompt,status:"failed"});
- }finally{activeJob=null;controller=null;currentStage=null;btn.disabled=false;$("btnText").textContent="✨ Generate Video"}
+ }finally{activeJob=null;controller=null;currentStage=null;isGenerating=false;btn.disabled=false;$("btnText").textContent="✨ Generate Video"}
 });
 cancel.addEventListener("click",()=>{if(controller)controller.abort()});
 $("clearHistory").addEventListener("click",()=>{localStorage.removeItem("ai_video_history");renderHistory()});
