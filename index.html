@@ -104,7 +104,7 @@ html{scroll-behavior:smooth}body{background:#07070a}
 const API_BASE_URL="https://founder-workstation.taila75704.ts.net:8443";
 const endpoints={script:API_BASE_URL+"/webhook/generate-video",images:API_BASE_URL+"/webhook/generate-images",audio:API_BASE_URL+"/webhook/generate-audio",compile:API_BASE_URL+"/webhook/compile-video"};
 const $=id=>document.getElementById(id), form=$("videoForm"), btn=$("generateBtn"), cancel=$("cancelBtn");
-let controller=null, activeJob=null;
+let controller=null, activeJob=null, currentStage=null;
 const stepNames=["script","images","audio","compile"];
 function setStep(name,state,msg){
  const el=document.querySelector('[data-step="'+name+'"]'); if(!el)return;
@@ -116,8 +116,8 @@ function setStep(name,state,msg){
  else {el.className=base+" border border-white/10 bg-black/20";badge.textContent="⏳ Waiting";badge.className="step-badge text-xs text-zinc-500";icon.textContent=stepNames.indexOf(name)+1}
  status.textContent=msg||({working:"Generating...",done:"Completed",error:"Failed",waiting:"Waiting"}[state]||"Waiting");
 }
-function reset(){ $("errorBox").classList.add("hidden");$("resultBox").classList.add("hidden");$("videoPreview").removeAttribute("src");$("jobLabel").textContent="Starting new job...";$("overallBadge").textContent="🔄 Generating...";stepNames.forEach(n=>setStep(n,"waiting")); }
-function error(msg){$("errorBox").textContent=msg;$("errorBox").classList.remove("hidden");$("overallBadge").textContent="❌ Failed";}
+function reset(){ $("errorBox").classList.add("hidden");$("resultBox").classList.add("hidden");$("videoPreview").removeAttribute("src");$("jobLabel").textContent="Starting new job...";$("overallBadge").textContent="🔄 Starting...";currentStage=null;stepNames.forEach(n=>setStep(n,"waiting")); }
+function error(msg){$("errorBox").textContent=msg;$("errorBox").classList.remove("hidden");$("overallBadge").textContent="❌ Failed";if(currentStage)setStep(currentStage,"error",msg);}
 async function post(url,body){
  controller=new AbortController(); cancel.classList.remove("hidden");
  const timer=setTimeout(()=>controller.abort(),15*60*1000);
@@ -141,19 +141,18 @@ form.addEventListener("submit",async e=>{
  const payload={prompt:$("prompt").value.trim(),duration:Number($("duration").value),language:$("language").value,aspect_ratio:$("aspect").value,resolution:$("resolution").value,style:$("style").value};
  if(!payload.prompt){btn.disabled=false;return error("Please enter a topic or prompt.")}
  try{
-  setStep("script","working","Creating script and scenes...");
+  currentStage="script";$("overallBadge").textContent="🔄 Segment 1/4 running";setStep("script","working","Segment 1 sent to n8n — creating script & scenes...");
   const s=await post(endpoints.script,payload);activeJob=jobId(s);if(!activeJob)throw new Error("Segment 1 did not return job_id.");
-  $("jobLabel").textContent="Job ID: "+activeJob;setStep("script","done","Script & scenes saved");
-  setStep("images","working","Generating scene images...");await post(endpoints.images,{job_id:activeJob});setStep("images","done","Images saved");
-  setStep("audio","working","Generating voiceover...");await post(endpoints.audio,{job_id:activeJob});setStep("audio","done","Voiceover saved");
-  setStep("compile","working","Rendering final MP4...");const c=await post(endpoints.compile,{job_id:activeJob});const url=videoUrl(c);if(!url)throw new Error("Segment 4 did not return video_url.");
-  setStep("compile","done","Final video rendered");$("overallBadge").textContent="✅ Completed";$("videoPreview").src=url;$("openBtn").href=url;$("downloadBtn").href=url;$("resultBox").classList.remove("hidden");
+  $("jobLabel").textContent="Job ID: "+activeJob;setStep("script","done","Segment 1 completed — script & scenes saved");
+  currentStage="images";$("overallBadge").textContent="🔄 Segment 2/4 running";setStep("images","working","Segment 2 sent to n8n — generating scene images...");await post(endpoints.images,{job_id:activeJob});setStep("images","done","Segment 2 completed — images saved");
+  currentStage="audio";$("overallBadge").textContent="🔄 Segment 3/4 running";setStep("audio","working","Segment 3 sent to n8n — generating voiceover...");await post(endpoints.audio,{job_id:activeJob});setStep("audio","done","Segment 3 completed — voiceover saved");
+  currentStage="compile";$("overallBadge").textContent="🔄 Segment 4/4 running";setStep("compile","working","Segment 4 sent to n8n — rendering final MP4...");const c=await post(endpoints.compile,{job_id:activeJob});const url=videoUrl(c);if(!url)throw new Error("Segment 4 completed without returning a video URL.");
+  setStep("compile","done","Segment 4 completed — final video rendered");currentStage=null;$("overallBadge").textContent="✅ All 4 segments completed";$("videoPreview").src=url;$("openBtn").href=url;$("downloadBtn").href=url;$("resultBox").classList.remove("hidden");
   saveHistory({job_id:activeJob,prompt:payload.prompt,status:"completed",video_url:url,created_at:new Date().toISOString()});
  }catch(err){
-  const msg=err.name==="AbortError"?"Generation cancelled or timed out.":err.message||String(err);error(msg);
-  const current=[...document.querySelectorAll(".step")].find(x=>x.className.includes("violet-"));if(current)current.querySelector(".step-badge").textContent="❌ Failed";
+  const msg=err.name==="AbortError"?"Generation cancelled or timed out while Segment "+(currentStage?({script:"1",images:"2",audio:"3",compile:"4"}[currentStage]||"?"):"?")+" was running.":(currentStage?"Segment "+({script:"1",images:"2",audio:"3",compile:"4"}[currentStage]||"?")+" failed: ":"")+ (err.message||String(err));error(msg);
   if(activeJob)saveHistory({job_id:activeJob,prompt:payload.prompt,status:"failed"});
- }finally{activeJob=null;controller=null;btn.disabled=false;$("btnText").textContent="✨ Generate Video"}
+ }finally{activeJob=null;controller=null;currentStage=null;btn.disabled=false;$("btnText").textContent="✨ Generate Video"}
 });
 cancel.addEventListener("click",()=>{if(controller)controller.abort()});
 $("clearHistory").addEventListener("click",()=>{localStorage.removeItem("ai_video_history");renderHistory()});
