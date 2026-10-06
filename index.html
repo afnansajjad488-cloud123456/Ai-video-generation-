@@ -78,6 +78,7 @@ html{scroll-behavior:smooth}body{background:#07070a}
 
 <div class="glass rounded-3xl border border-white/10 p-5 sm:p-7">
  <div class="mb-5 flex items-start justify-between gap-4"><div><h2 class="text-xl font-bold">Generation pipeline</h2><p id="jobLabel" class="mt-1 break-all text-xs text-zinc-500">No active job</p></div><span id="overallBadge" class="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-500">⏳ Waiting</span></div>
+ <div id="liveStatus" class="mb-4 rounded-2xl border border-white/10 bg-black/30 p-4"><div class="flex items-center gap-3"><span id="liveDot" class="h-2.5 w-2.5 rounded-full bg-zinc-600"></span><div><div id="liveTitle" class="text-sm font-semibold">Ready</div><div id="liveMessage" class="mt-0.5 text-xs text-zinc-500">Your prompt will stay visible while generation runs.</div></div></div></div>
  <div class="space-y-3">
   <div data-step="script" class="step rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center gap-3"><b class="step-icon grid h-10 w-10 place-items-center rounded-xl bg-white/5">1</b><div class="flex-1"><b>Script & scenes</b><div class="step-status text-xs text-zinc-500">Waiting</div></div><span class="step-badge text-xs text-zinc-500">⏳ Waiting</span></div></div>
   <div data-step="images" class="step rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center gap-3"><b class="step-icon grid h-10 w-10 place-items-center rounded-xl bg-white/5">2</b><div class="flex-1"><b>Scene images</b><div class="step-status text-xs text-zinc-500">Waiting</div></div><span class="step-badge text-xs text-zinc-500">⏳ Waiting</span></div></div>
@@ -116,8 +117,9 @@ function setStep(name,state,msg){
  else {el.className=base+" border border-white/10 bg-black/20";badge.textContent="⏳ Waiting";badge.className="step-badge text-xs text-zinc-500";icon.textContent=stepNames.indexOf(name)+1}
  status.textContent=msg||({working:"Generating...",done:"Completed",error:"Failed",waiting:"Waiting"}[state]||"Waiting");
 }
+function live(title,msg,state){$("liveTitle").textContent=title;$("liveMessage").textContent=msg;$("liveDot").className="h-2.5 w-2.5 rounded-full "+(state==="error"?"bg-red-400":state==="done"?"bg-emerald-400":state==="working"?"bg-violet-400":"bg-zinc-600");}
 function reset(){ $("errorBox").classList.add("hidden");$("resultBox").classList.add("hidden");$("videoPreview").removeAttribute("src");$("jobLabel").textContent="Starting new job...";$("overallBadge").textContent="🔄 Starting...";currentStage=null;stepNames.forEach(n=>setStep(n,"waiting")); }
-function error(msg){$("errorBox").textContent=msg;$("errorBox").classList.remove("hidden");$("overallBadge").textContent="❌ Failed";if(currentStage)setStep(currentStage,"error",msg);}
+function error(msg){live("Generation stopped",msg,"error");$("errorBox").textContent=msg;$("errorBox").classList.remove("hidden");$("overallBadge").textContent="❌ Failed";if(currentStage)setStep(currentStage,"error",msg);}
 async function post(url,body){
  controller=new AbortController(); cancel.classList.remove("hidden");
  const timer=setTimeout(()=>controller.abort(),15*60*1000);
@@ -137,17 +139,17 @@ function renderHistory(){let h=[];try{h=JSON.parse(localStorage.getItem("ai_vide
 function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
 function escapeAttr(s){return String(s||"").replace(/"/g,"&quot;")}
 form.addEventListener("submit",async e=>{
- e.preventDefault();reset();btn.disabled=true;$("btnText").textContent="⏳ Generating...";
+ e.preventDefault();reset();localStorage.setItem("ai_video_draft",JSON.stringify({prompt:$("prompt").value,duration:$("duration").value,language:$("language").value,aspect:$("aspect").value,resolution:$("resolution").value,style:$("style").value}));btn.disabled=true;$("btnText").textContent="⏳ Generating...";
  const payload={prompt:$("prompt").value.trim(),duration:Number($("duration").value),language:$("language").value,aspect_ratio:$("aspect").value,resolution:$("resolution").value,style:$("style").value};
  if(!payload.prompt){btn.disabled=false;return error("Please enter a topic or prompt.")}
  try{
-  currentStage="script";$("overallBadge").textContent="🔄 Segment 1/4 running";setStep("script","working","Segment 1 sent to n8n — creating script & scenes...");
+  currentStage="script";live("Segment 1/4 running","n8n is creating the script and scenes. Your prompt is preserved.","working");$("overallBadge").textContent="🔄 Segment 1/4 running";setStep("script","working","Segment 1 sent to n8n — creating script & scenes...");
   const s=await post(endpoints.script,payload);activeJob=jobId(s);if(!activeJob)throw new Error("Segment 1 did not return job_id.");
-  $("jobLabel").textContent="Job ID: "+activeJob;setStep("script","done","Segment 1 completed — script & scenes saved");
-  currentStage="images";$("overallBadge").textContent="🔄 Segment 2/4 running";setStep("images","working","Segment 2 sent to n8n — generating scene images...");await post(endpoints.images,{job_id:activeJob});setStep("images","done","Segment 2 completed — images saved");
-  currentStage="audio";$("overallBadge").textContent="🔄 Segment 3/4 running";setStep("audio","working","Segment 3 sent to n8n — generating voiceover...");await post(endpoints.audio,{job_id:activeJob});setStep("audio","done","Segment 3 completed — voiceover saved");
-  currentStage="compile";$("overallBadge").textContent="🔄 Segment 4/4 running";setStep("compile","working","Segment 4 sent to n8n — rendering final MP4...");const c=await post(endpoints.compile,{job_id:activeJob});const url=videoUrl(c);if(!url)throw new Error("Segment 4 completed without returning a video URL.");
-  setStep("compile","done","Segment 4 completed — final video rendered");currentStage=null;$("overallBadge").textContent="✅ All 4 segments completed";$("videoPreview").src=url;$("openBtn").href=url;$("downloadBtn").href=url;$("resultBox").classList.remove("hidden");
+  $("jobLabel").textContent="Job ID: "+activeJob;live("Segment 1 completed","Script and scenes were returned successfully. Starting Segment 2.","done");setStep("script","done","Segment 1 completed — script & scenes saved");
+  currentStage="images";live("Segment 2/4 running","n8n is generating scene images.","working");$("overallBadge").textContent="🔄 Segment 2/4 running";setStep("images","working","Segment 2 sent to n8n — generating scene images...");await post(endpoints.images,{job_id:activeJob});live("Segment 2 completed","Scene images were returned successfully. Starting Segment 3.","done");setStep("images","done","Segment 2 completed — images saved");
+  currentStage="audio";live("Segment 3/4 running","n8n is generating the voiceover.","working");$("overallBadge").textContent="🔄 Segment 3/4 running";setStep("audio","working","Segment 3 sent to n8n — generating voiceover...");await post(endpoints.audio,{job_id:activeJob});live("Segment 3 completed","Voiceover was returned successfully. Starting Segment 4.","done");setStep("audio","done","Segment 3 completed — voiceover saved");
+  currentStage="compile";live("Segment 4/4 running","n8n is rendering the final MP4. This can take time.","working");$("overallBadge").textContent="🔄 Segment 4/4 running";setStep("compile","working","Segment 4 sent to n8n — rendering final MP4...");const c=await post(endpoints.compile,{job_id:activeJob});const url=videoUrl(c);if(!url)throw new Error("Segment 4 completed without returning a video URL.");
+  live("All 4 segments completed","Final MP4 URL received successfully.","done");setStep("compile","done","Segment 4 completed — final video rendered");currentStage=null;$("overallBadge").textContent="✅ All 4 segments completed";$("videoPreview").src=url;$("openBtn").href=url;$("downloadBtn").href=url;$("resultBox").classList.remove("hidden");
   saveHistory({job_id:activeJob,prompt:payload.prompt,status:"completed",video_url:url,created_at:new Date().toISOString()});
  }catch(err){
   const msg=err.name==="AbortError"?"Generation cancelled or timed out while Segment "+(currentStage?({script:"1",images:"2",audio:"3",compile:"4"}[currentStage]||"?"):"?")+" was running.":(currentStage?"Segment "+({script:"1",images:"2",audio:"3",compile:"4"}[currentStage]||"?")+" failed: ":"")+ (err.message||String(err));error(msg);
@@ -156,6 +158,8 @@ form.addEventListener("submit",async e=>{
 });
 cancel.addEventListener("click",()=>{if(controller)controller.abort()});
 $("clearHistory").addEventListener("click",()=>{localStorage.removeItem("ai_video_history");renderHistory()});
+try{const d=JSON.parse(localStorage.getItem("ai_video_draft")||"null");if(d){$("prompt").value=d.prompt||"";$("duration").value=d.duration||"300";$("language").value=d.language||"English";$("aspect").value=d.aspect||"16:9";$("resolution").value=d.resolution||"720p";$("style").value=d.style||"Cinematic"}}catch{}
+$("prompt").addEventListener("input",()=>localStorage.setItem("ai_video_draft",JSON.stringify({prompt:$("prompt").value,duration:$("duration").value,language:$("language").value,aspect:$("aspect").value,resolution:$("resolution").value,style:$("style").value})));
 renderHistory();
 })();
 </script>
