@@ -1,338 +1,163 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#09090b" />
-  <title>VIP AI Video Studio</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          boxShadow: {
-            glow: '0 0 50px rgba(168,85,247,.16)'
-          }
-        }
-      }
-    }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07070a">
+<title>AI Video Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{boxShadow:{glow:"0 0 80px rgba(124,58,237,.18)"}}}}</script>
+<style>
+html{scroll-behavior:smooth}body{background:#07070a}
+.grid-bg{background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:42px 42px}
+.glass{background:rgba(255,255,255,.045);backdrop-filter:blur(18px)}
+</style>
 </head>
-<body class="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
-  <div class="fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute left-1/2 top-[-260px] h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-purple-600/10 blur-3xl"></div>
-    <div class="absolute bottom-[-300px] right-[-200px] h-[600px] w-[600px] rounded-full bg-fuchsia-600/10 blur-3xl"></div>
+<body class="min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-100 antialiased">
+<div class="fixed inset-0 -z-10 grid-bg"></div>
+<div class="fixed inset-0 -z-10 overflow-hidden">
+ <div class="absolute left-1/2 top-[-260px] h-[620px] w-[900px] -translate-x-1/2 rounded-full bg-violet-600/15 blur-3xl"></div>
+ <div class="absolute bottom-[-300px] right-[-150px] h-[550px] w-[550px] rounded-full bg-fuchsia-600/10 blur-3xl"></div>
+</div>
+
+<main class="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+<header class="flex items-center justify-between border-b border-white/10 pb-5">
+ <div class="flex items-center gap-3">
+  <div class="grid h-10 w-10 place-items-center rounded-xl bg-white text-zinc-950 font-black">AI</div>
+  <div><div class="font-bold">AI Video Studio</div><div class="text-[11px] text-zinc-500">Script → Images → Voice → Video</div></div>
+ </div>
+ <div class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs">
+  <span id="connectionDot" class="h-2 w-2 rounded-full bg-zinc-600"></span><span id="connectionText">Backend not tested</span>
+ </div>
+</header>
+
+<section class="py-12 text-center sm:py-16">
+ <div class="mx-auto mb-4 inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-xs text-violet-200">✦ FREE AI VIDEO STUDIO</div>
+ <h1 class="text-4xl font-black tracking-tight sm:text-6xl">Turn an idea into a <span class="text-violet-400">video.</span></h1>
+ <p class="mx-auto mt-4 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">Write one idea. Your n8n pipeline creates the script, scene images, voiceover and final MP4 automatically.</p>
+</section>
+
+<section class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+<div class="glass rounded-3xl border border-white/10 p-5 shadow-glow sm:p-7">
+ <div class="mb-6"><h2 class="text-xl font-bold">Create video</h2><p class="mt-1 text-sm text-zinc-500">No account or secret key is required in the browser.</p></div>
+ <form id="videoForm" class="space-y-5">
+  <div>
+   <label class="mb-2 block text-sm font-medium">Topic / prompt</label>
+   <textarea id="prompt" required rows="6" placeholder="Example: Explain black holes in simple Urdu for beginners..." class="w-full resize-y rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"></textarea>
   </div>
+  <div class="grid gap-4 sm:grid-cols-2">
+   <label class="text-sm font-medium">Duration
+    <select id="duration" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 font-normal outline-none focus:border-violet-500">
+     <option value="15">15 seconds</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60" selected>60 seconds</option>
+    </select>
+   </label>
+   <label class="text-sm font-medium">Language
+    <select id="language" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 font-normal outline-none focus:border-violet-500">
+     <option>English</option><option>Urdu</option><option>Hindi</option><option>Arabic</option><option>Roman Urdu</option>
+    </select>
+   </label>
+  </div>
+  <div class="grid gap-4 sm:grid-cols-3">
+   <label class="text-sm font-medium">Aspect
+    <select id="aspect" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 font-normal outline-none focus:border-violet-500"><option>16:9</option><option>9:16</option><option>1:1</option></select>
+   </label>
+   <label class="text-sm font-medium">Resolution
+    <select id="resolution" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 font-normal outline-none focus:border-violet-500"><option>720p</option><option>1080p</option></select>
+   </label>
+   <label class="text-sm font-medium">Style
+    <select id="style" class="mt-2 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 font-normal outline-none focus:border-violet-500"><option>Cinematic</option><option>Anime</option><option>3D</option><option>Realistic</option><option>Illustration</option></select>
+   </label>
+  </div>
+  <div class="flex gap-3">
+   <button id="generateBtn" class="flex-1 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"><span id="btnText">✨ Generate Video</span></button>
+   <button id="cancelBtn" type="button" class="hidden rounded-2xl border border-red-400/20 bg-red-400/10 px-5 text-sm font-semibold text-red-200">Cancel</button>
+  </div>
+ </form>
+ <div id="errorBox" class="mt-5 hidden rounded-2xl border border-red-400/20 bg-red-400/10 p-4 text-sm text-red-200"></div>
+</div>
 
-  <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-    <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
-          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-          FREE AI VIDEO STUDIO
-        </div>
-        <h1 class="text-3xl font-black tracking-tight sm:text-5xl">VIP AI Video Studio</h1>
-        <p class="mt-2 max-w-2xl text-sm text-zinc-400 sm:text-base">
-          Topic do — script, scenes, images, voiceover aur final video automated pipeline se generate hoga.
-        </p>
-      </div>
-      <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-zinc-400">
-        <div class="font-semibold text-zinc-200">Backend</div>
-        <div class="mt-1 break-all">Tailscale n8n • 4 segments</div>
-      </div>
-    </header>
+<div class="glass rounded-3xl border border-white/10 p-5 sm:p-7">
+ <div class="mb-5 flex items-start justify-between gap-4"><div><h2 class="text-xl font-bold">Generation pipeline</h2><p id="jobLabel" class="mt-1 break-all text-xs text-zinc-500">No active job</p></div><span id="overallBadge" class="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-500">⏳ Waiting</span></div>
+ <div class="space-y-3">
+  <div data-step="script" class="step rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center gap-3"><b class="step-icon grid h-10 w-10 place-items-center rounded-xl bg-white/5">1</b><div class="flex-1"><b>Script & scenes</b><div class="step-status text-xs text-zinc-500">Waiting</div></div><span class="step-badge text-xs text-zinc-500">⏳ Waiting</span></div></div>
+  <div data-step="images" class="step rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center gap-3"><b class="step-icon grid h-10 w-10 place-items-center rounded-xl bg-white/5">2</b><div class="flex-1"><b>Scene images</b><div class="step-status text-xs text-zinc-500">Waiting</div></div><span class="step-badge text-xs text-zinc-500">⏳ Waiting</span></div></div>
+  <div data-step="audio" class="step rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center gap-3"><b class="step-icon grid h-10 w-10 place-items-center rounded-xl bg-white/5">3</b><div class="flex-1"><b>Voiceover</b><div class="step-status text-xs text-zinc-500">Waiting</div></div><span class="step-badge text-xs text-zinc-500">⏳ Waiting</span></div></div>
+  <div data-step="compile" class="step rounded-2xl border border-white/10 bg-black/20 p-4"><div class="flex items-center gap-3"><b class="step-icon grid h-10 w-10 place-items-center rounded-xl bg-white/5">4</b><div class="flex-1"><b>Final MP4</b><div class="step-status text-xs text-zinc-500">Waiting</div></div><span class="step-badge text-xs text-zinc-500">⏳ Waiting</span></div></div>
+ </div>
+ <div id="resultBox" class="mt-5 hidden rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+  <div class="font-bold text-emerald-300">✓ Video ready</div><video id="videoPreview" class="mt-4 w-full rounded-xl" controls playsinline></video>
+  <div class="mt-4 flex gap-2"><a id="openBtn" target="_blank" rel="noopener" class="flex-1 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-bold text-zinc-950">Open video</a><a id="downloadBtn" download class="flex-1 rounded-xl border border-white/10 px-4 py-2.5 text-center text-sm font-bold">Download</a></div>
+ </div>
+</div>
+</section>
 
-    <section class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
-      <div class="rounded-3xl border border-white/10 bg-white/[.04] p-5 shadow-glow backdrop-blur sm:p-7">
-        <div class="mb-6">
-          <h2 class="text-xl font-bold">Create your video</h2>
-          <p class="mt-1 text-sm text-zinc-400">Simple inputs — baqi automation khud handle karegi.</p>
-        </div>
+<section class="mt-6 glass rounded-3xl border border-white/10 p-5 sm:p-7">
+ <div class="flex items-center justify-between"><div><h2 class="text-lg font-bold">Recent generations</h2><p class="text-xs text-zinc-500">Saved locally in this browser.</p></div><button id="clearHistory" class="text-xs text-zinc-500 hover:text-white">Clear</button></div>
+ <div id="history" class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><div class="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-zinc-600">No generations yet.</div></div>
+</section>
 
-        <form id="videoForm" class="space-y-5">
-          <div>
-            <label for="prompt" class="mb-2 block text-sm font-medium text-zinc-200">Video Topic / Prompt</label>
-            <textarea id="prompt" required rows="6"
-              placeholder="Example: Explain black holes in simple Urdu for beginners..."
-              class="w-full resize-y rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none transition placeholder:text-zinc-600 focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20"></textarea>
-          </div>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label for="duration" class="mb-2 block text-sm font-medium text-zinc-200">Duration (seconds)</label>
-              <input id="duration" type="number" min="5" max="600" value="60" required
-                class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20" />
-            </div>
-            <div>
-              <label for="language" class="mb-2 block text-sm font-medium text-zinc-200">Language</label>
-              <select id="language"
-                class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70 focus:ring-2 focus:ring-purple-500/20">
-                <option value="English">English</option>
-                <option value="Urdu">Urdu</option>
-                <option value="Roman Urdu">Roman Urdu</option>
-                <option value="Hindi">Hindi</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid gap-4 sm:grid-cols-3">
-            <div>
-              <label for="aspect" class="mb-2 block text-sm font-medium text-zinc-200">Aspect Ratio</label>
-              <select id="aspect" class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70">
-                <option value="16:9">16:9</option>
-                <option value="9:16">9:16</option>
-                <option value="1:1">1:1</option>
-              </select>
-            </div>
-            <div>
-              <label for="resolution" class="mb-2 block text-sm font-medium text-zinc-200">Resolution</label>
-              <select id="resolution" class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70">
-                <option value="720p">720p</option>
-                <option value="1080p">1080p</option>
-                <option value="480p">480p</option>
-              </select>
-            </div>
-            <div>
-              <label for="style" class="mb-2 block text-sm font-medium text-zinc-200">Style</label>
-              <select id="style" class="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-purple-500/70">
-                <option value="cinematic">Cinematic</option>
-                <option value="documentary">Documentary</option>
-                <option value="realistic">Realistic</option>
-                <option value="anime">Anime</option>
-                <option value="minimal">Minimal</option>
-              </select>
-            </div>
-          </div>
-
-          <button id="generateBtn" type="submit"
-            class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50">
-            <span id="btnIcon">✨</span>
-            <span id="btnText">Generate Video</span>
-          </button>
-        </form>
-
-        <div id="errorBox" class="mt-5 hidden rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200"></div>
-      </div>
-
-      <div class="rounded-3xl border border-white/10 bg-white/[.04] p-5 backdrop-blur sm:p-7">
-        <div class="mb-6 flex items-center justify-between">
-          <div>
-            <h2 class="text-xl font-bold">Live Progress</h2>
-            <p id="jobLabel" class="mt-1 text-xs text-zinc-500">No active job</p>
-          </div>
-          <div id="overallBadge" class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-400">⏳ Waiting</div>
-        </div>
-
-        <div id="steps" class="space-y-3">
-          <div data-step="script" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div class="flex items-center gap-3">
-              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">1</div>
-              <div class="min-w-0 flex-1"><div class="font-semibold">Script & Scenes</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
-              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
-            </div>
-          </div>
-          <div data-step="images" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div class="flex items-center gap-3">
-              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">2</div>
-              <div class="min-w-0 flex-1"><div class="font-semibold">Visual Images</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
-              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
-            </div>
-          </div>
-          <div data-step="audio" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div class="flex items-center gap-3">
-              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">3</div>
-              <div class="min-w-0 flex-1"><div class="font-semibold">Voiceover Audio</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
-              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
-            </div>
-          </div>
-          <div data-step="compile" class="step rounded-2xl border border-white/10 bg-black/20 p-4">
-            <div class="flex items-center gap-3">
-              <div class="step-icon grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/5 text-lg">4</div>
-              <div class="min-w-0 flex-1"><div class="font-semibold">Final Compilation</div><div class="step-status text-xs text-zinc-500">Waiting</div></div>
-              <span class="step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">⏳ Waiting</span>
-            </div>
-          </div>
-        </div>
-
-        <div id="resultBox" class="mt-6 hidden rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
-          <div class="text-sm font-bold text-emerald-300">✅ Video Ready</div>
-          <p class="mt-1 text-xs text-zinc-400">Final rendered video:</p>
-          <a id="videoLink" href="#" target="_blank" rel="noopener noreferrer"
-             class="mt-3 block truncate rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-semibold text-white hover:bg-black/30"></a>
-          <video id="videoPreview" class="mt-4 hidden w-full rounded-2xl border border-white/10" controls playsinline></video>
-        </div>
-      </div>
-    </section>
-
-    <footer class="mt-8 text-center text-xs text-zinc-600">
-      VIP AI Video Studio • Frontend hosted on GitHub Pages • Orchestration via n8n
-    </footer>
-  </main>
+<footer class="py-8 text-center text-xs text-zinc-600">AI Video Studio • GitHub Pages frontend • Supabase database • n8n orchestration</footer>
+</main>
 
 <script>
-(() => {
-  const N8N_BASE = "https://founder-workstation.taila75704.ts.net:8443";
-  const SUPABASE_URL = "https://icdfvaksuwjbhqpzwcmn.supabase.co";
-  // Supabase is the central job database. The browser does not write to it directly;
-  // n8n handles database access securely on the backend.
-  const endpoints = {
-    script: N8N_BASE + "/webhook/generate-video",
-    images: N8N_BASE + "/webhook/generate-images",
-    audio: N8N_BASE + "/webhook/generate-audio",
-    compile: N8N_BASE + "/webhook/compile-video"
-  };
-
-  const $ = (id) => document.getElementById(id);
-  const form = $("videoForm");
-  const button = $("generateBtn");
-  const errorBox = $("errorBox");
-  const resultBox = $("resultBox");
-  const videoLink = $("videoLink");
-  const videoPreview = $("videoPreview");
-
-  function resetUI() {
-    errorBox.classList.add("hidden");
-    resultBox.classList.add("hidden");
-    videoPreview.classList.add("hidden");
-    videoPreview.removeAttribute("src");
-    $("jobLabel").textContent = "Starting new job...";
-    $("overallBadge").textContent = "🔄 Generating...";
-    document.querySelectorAll(".step").forEach((el) => {
-      el.className = "step rounded-2xl border border-white/10 bg-black/20 p-4";
-      el.querySelector(".step-status").textContent = "Waiting";
-      el.querySelector(".step-badge").textContent = "⏳ Waiting";
-      el.querySelector(".step-badge").className = "step-badge rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500";
-    });
-  }
-
-  function setStep(name, state, message) {
-    const el = document.querySelector('[data-step="' + name + '"]');
-    if (!el) return;
-    const badge = el.querySelector(".step-badge");
-    const status = el.querySelector(".step-status");
-    const icon = el.querySelector(".step-icon");
-
-    if (state === "working") {
-      el.className = "step rounded-2xl border border-purple-400/20 bg-purple-500/10 p-4";
-      badge.textContent = "🔄 Generating...";
-      badge.className = "step-badge rounded-full border border-purple-400/20 bg-purple-400/10 px-2.5 py-1 text-[11px] text-purple-200";
-      icon.textContent = "⏳";
-    } else if (state === "done") {
-      el.className = "step rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4";
-      badge.textContent = "✅ Done";
-      badge.className = "step-badge rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[11px] text-emerald-200";
-      icon.textContent = "✓";
-    } else if (state === "error") {
-      el.className = "step rounded-2xl border border-red-400/20 bg-red-400/10 p-4";
-      badge.textContent = "❌ Failed";
-      badge.className = "step-badge rounded-full border border-red-400/20 bg-red-400/10 px-2.5 py-1 text-[11px] text-red-200";
-      icon.textContent = "!";
-    } else {
-      icon.textContent = name === "script" ? "1" : name === "images" ? "2" : name === "audio" ? "3" : "4";
-    }
-    status.textContent = message || (state === "working" ? "Generating..." : state === "done" ? "Completed" : "Waiting");
-  }
-
-  function showError(message) {
-    errorBox.textContent = message;
-    errorBox.classList.remove("hidden");
-    $("overallBadge").textContent = "❌ Failed";
-  }
-
-  async function postJSON(url, body, timeoutMs = 10 * 60 * 1000) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(body),
-        signal: controller.signal
-      });
-      const raw = await response.text();
-      let data;
-      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { raw }; }
-      if (!response.ok) {
-        throw new Error(data?.message || data?.error || raw || ("HTTP " + response.status));
-      }
-      return data;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  function findJobId(data) {
-    return data?.job_id || data?.jobId || data?.data?.job_id || data?.data?.jobId;
-  }
-
-  function findVideoUrl(data) {
-    return data?.video_url || data?.videoUrl || data?.final_video_url || data?.url ||
-           data?.data?.video_url || data?.data?.videoUrl || data?.data?.final_video_url || data?.data?.url;
-  }
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    resetUI();
-
-    const payload = {
-      prompt: $("prompt").value.trim(),
-      duration: Number($("duration").value),
-      language: $("language").value,
-      aspect_ratio: $("aspect").value,
-      resolution: $("resolution").value,
-      style: $("style").value
-    };
-
-    if (!payload.prompt) return showError("Please enter a video topic/prompt.");
-    if (!Number.isFinite(payload.duration) || payload.duration < 5) return showError("Duration must be at least 5 seconds.");
-
-    button.disabled = true;
-    $("btnIcon").textContent = "⏳";
-    $("btnText").textContent = "Generating...";
-
-    try {
-      setStep("script", "working", "Creating script, narration & scenes...");
-      const scriptResponse = await postJSON(endpoints.script, payload);
-      const jobId = findJobId(scriptResponse);
-      if (!jobId) throw new Error("Segment 1 completed but no job_id was returned by n8n.");
-
-      $("jobLabel").textContent = "Job ID: " + jobId;
-      setStep("script", "done", "Script & scenes saved");
-
-      setStep("images", "working", "Generating scene images...");
-      await postJSON(endpoints.images, { job_id: jobId });
-      setStep("images", "done", "Visual images saved");
-
-      setStep("audio", "working", "Generating voiceover...");
-      await postJSON(endpoints.audio, { job_id: jobId });
-      setStep("audio", "done", "Voiceover saved");
-
-      setStep("compile", "working", "Rendering final MP4...");
-      const compileResponse = await postJSON(endpoints.compile, { job_id: jobId });
-      const finalUrl = findVideoUrl(compileResponse);
-      if (!finalUrl) throw new Error("Final compilation completed but no video_url was returned.");
-
-      setStep("compile", "done", "Final video rendered");
-      $("overallBadge").textContent = "✅ Completed";
-
-      videoLink.href = finalUrl;
-      videoLink.textContent = finalUrl;
-      videoPreview.src = finalUrl;
-      videoPreview.classList.remove("hidden");
-      resultBox.classList.remove("hidden");
-    } catch (error) {
-      const message = error?.name === "AbortError"
-        ? "Request timed out. Check the n8n execution and try again."
-        : (error?.message || String(error));
-      showError(message);
-      const active = [...document.querySelectorAll(".step")].find(el => el.className.includes("purple"));
-      if (active) active.querySelector(".step-badge").textContent = "❌ Failed";
-    } finally {
-      button.disabled = false;
-      $("btnIcon").textContent = "✨";
-      $("btnText").textContent = "Generate Video";
-    }
-  });
+(()=> {
+const API_BASE_URL="https://founder-workstation.taila75704.ts.net:8443";
+const endpoints={script:API_BASE_URL+"/webhook/generate-video",images:API_BASE_URL+"/webhook/generate-images",audio:API_BASE_URL+"/webhook/generate-audio",compile:API_BASE_URL+"/webhook/compile-video"};
+const $=id=>document.getElementById(id), form=$("videoForm"), btn=$("generateBtn"), cancel=$("cancelBtn");
+let controller=null, activeJob=null;
+const stepNames=["script","images","audio","compile"];
+function setStep(name,state,msg){
+ const el=document.querySelector('[data-step="'+name+'"]'); if(!el)return;
+ const badge=el.querySelector(".step-badge"), status=el.querySelector(".step-status"), icon=el.querySelector(".step-icon");
+ const base="step rounded-2xl p-4";
+ if(state==="working"){el.className=base+" border border-violet-400/20 bg-violet-500/10";badge.textContent="🔄 Generating...";badge.className="step-badge text-xs text-violet-200";icon.textContent="⏳"}
+ else if(state==="done"){el.className=base+" border border-emerald-400/20 bg-emerald-400/10";badge.textContent="✅ Done";badge.className="step-badge text-xs text-emerald-200";icon.textContent="✓"}
+ else if(state==="error"){el.className=base+" border border-red-400/20 bg-red-400/10";badge.textContent="❌ Failed";badge.className="step-badge text-xs text-red-200";icon.textContent="!"}
+ else {el.className=base+" border border-white/10 bg-black/20";badge.textContent="⏳ Waiting";badge.className="step-badge text-xs text-zinc-500";icon.textContent=stepNames.indexOf(name)+1}
+ status.textContent=msg||({working:"Generating...",done:"Completed",error:"Failed",waiting:"Waiting"}[state]||"Waiting");
+}
+function reset(){ $("errorBox").classList.add("hidden");$("resultBox").classList.add("hidden");$("videoPreview").removeAttribute("src");$("jobLabel").textContent="Starting new job...";$("overallBadge").textContent="🔄 Generating...";stepNames.forEach(n=>setStep(n,"waiting")); }
+function error(msg){$("errorBox").textContent=msg;$("errorBox").classList.remove("hidden");$("overallBadge").textContent="❌ Failed";}
+async function post(url,body){
+ controller=new AbortController(); cancel.classList.remove("hidden");
+ const timer=setTimeout(()=>controller.abort(),15*60*1000);
+ try{
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(body),signal:controller.signal});
+  const raw=await r.text(); let data={}; try{data=raw?JSON.parse(raw):{}}catch{data={raw}};
+  $("connectionDot").className="h-2 w-2 rounded-full "+(r.ok?"bg-emerald-400":"bg-red-400");
+  $("connectionText").textContent=r.ok?"Backend connected":"Backend error";
+  if(!r.ok)throw new Error(data?.message||data?.error||raw||("HTTP "+r.status));
+  return data;
+ }finally{clearTimeout(timer);controller=null;cancel.classList.add("hidden")}
+}
+function jobId(x){return x?.job_id||x?.jobId||x?.data?.job_id||x?.data?.jobId}
+function videoUrl(x){return x?.video_url||x?.final_video_url||x?.videoUrl||x?.url||x?.data?.video_url||x?.data?.final_video_url||x?.data?.url}
+function saveHistory(item){let h=[];try{h=JSON.parse(localStorage.getItem("ai_video_history")||"[]")}catch{};h.unshift(item);localStorage.setItem("ai_video_history",JSON.stringify(h.slice(0,12)));renderHistory()}
+function renderHistory(){let h=[];try{h=JSON.parse(localStorage.getItem("ai_video_history")||"[]")}catch{};const box=$("history");if(!h.length){box.innerHTML='<div class="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-zinc-600">No generations yet.</div>';return}box.innerHTML=h.map((x,i)=>'<div class="rounded-2xl border border-white/10 bg-black/20 p-4"><div class="truncate text-sm font-semibold">'+escapeHtml(x.prompt)+'</div><div class="mt-1 text-xs text-zinc-500">'+escapeHtml(x.status||"completed")+' • '+escapeHtml(x.job_id||"")+'</div>'+(x.video_url?'<a class="mt-3 inline-block text-xs font-bold text-violet-300 hover:text-violet-200" href="'+escapeAttr(x.video_url)+'" target="_blank" rel="noopener">Open video →</a>':"")+'</div>').join("")}
+function escapeHtml(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+function escapeAttr(s){return String(s||"").replace(/"/g,"&quot;")}
+form.addEventListener("submit",async e=>{
+ e.preventDefault();reset();btn.disabled=true;$("btnText").textContent="⏳ Generating...";
+ const payload={prompt:$("prompt").value.trim(),duration:Number($("duration").value),language:$("language").value,aspect_ratio:$("aspect").value,resolution:$("resolution").value,style:$("style").value};
+ if(!payload.prompt){btn.disabled=false;return error("Please enter a topic or prompt.")}
+ try{
+  setStep("script","working","Creating script and scenes...");
+  const s=await post(endpoints.script,payload);activeJob=jobId(s);if(!activeJob)throw new Error("Segment 1 did not return job_id.");
+  $("jobLabel").textContent="Job ID: "+activeJob;setStep("script","done","Script & scenes saved");
+  setStep("images","working","Generating scene images...");await post(endpoints.images,{job_id:activeJob});setStep("images","done","Images saved");
+  setStep("audio","working","Generating voiceover...");await post(endpoints.audio,{job_id:activeJob});setStep("audio","done","Voiceover saved");
+  setStep("compile","working","Rendering final MP4...");const c=await post(endpoints.compile,{job_id:activeJob});const url=videoUrl(c);if(!url)throw new Error("Segment 4 did not return video_url.");
+  setStep("compile","done","Final video rendered");$("overallBadge").textContent="✅ Completed";$("videoPreview").src=url;$("openBtn").href=url;$("downloadBtn").href=url;$("resultBox").classList.remove("hidden");
+  saveHistory({job_id:activeJob,prompt:payload.prompt,status:"completed",video_url:url,created_at:new Date().toISOString()});
+ }catch(err){
+  const msg=err.name==="AbortError"?"Generation cancelled or timed out.":err.message||String(err);error(msg);
+  const current=[...document.querySelectorAll(".step")].find(x=>x.className.includes("violet-"));if(current)current.querySelector(".step-badge").textContent="❌ Failed";
+  if(activeJob)saveHistory({job_id:activeJob,prompt:payload.prompt,status:"failed"});
+ }finally{activeJob=null;controller=null;btn.disabled=false;$("btnText").textContent="✨ Generate Video"}
+});
+cancel.addEventListener("click",()=>{if(controller)controller.abort()});
+$("clearHistory").addEventListener("click",()=>{localStorage.removeItem("ai_video_history");renderHistory()});
+renderHistory();
 })();
 </script>
 </body>
